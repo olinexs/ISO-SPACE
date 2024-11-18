@@ -24,16 +24,32 @@ def collect_input_for_placeholders(placeholders):
 
 def replace_placeholders_in_paragraphs(doc, replacements, logo_path):
     """Replace placeholders in paragraphs with the corresponding user input or images."""
+    
+    # Process body paragraphs
     for paragraph in doc.paragraphs:
         for placeholder, replacement in replacements.items():
             if f"{{{placeholder}}}" in paragraph.text:
                 paragraph.text = paragraph.text.replace(f"{{{placeholder}}}", replacement)
 
-        # Handle image placeholder (logo)
+        # Handle image placeholder (logo) in body paragraphs
         if "{logo}" in paragraph.text:
             paragraph.clear()
             run = paragraph.add_run()
             run.add_picture(logo_path, width=Inches(1.5))
+    
+    # Process headers
+    for section in doc.sections:
+        header = section.header
+        for paragraph in header.paragraphs:
+            for placeholder, replacement in replacements.items():
+                if f"{{{placeholder}}}" in paragraph.text:
+                    paragraph.text = paragraph.text.replace(f"{{{placeholder}}}", replacement)
+
+            # Handle logo placeholder in header
+            if "{logo}" in paragraph.text:
+                paragraph.clear()
+                run = paragraph.add_run()
+                run.add_picture(logo_path, width=Inches(1.5))
 
 def generate_document_with_placeholders(template_path, logo_path, output_path):
     """Generate a document by replacing placeholders with user input or images."""
@@ -79,7 +95,6 @@ def generate_document_with_placeholders(template_path, logo_path, output_path):
     # Save the modified document
     doc.save(output_path)
     print(f"Document saved to: {output_path}")
-
 
 # Example usage
 template_path = ""
